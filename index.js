@@ -1,22 +1,22 @@
-    require('dotenv').config(); // <-- Añade esto al principio
-    const express = require('express');
-    const connectDB = require('./db');
+const User = require('./User'); // Importa el modelo
 
-    const app = express();
-    // Ahora process.env.PORT sí funcionará si lo defines en el .env
-    const PORT = process.env.PORT || 5000;
+// RUTA PARA CREAR UN USUARIO (POST)
+app.post('/usuarios', async (req, res) => {
+    try {
+        const nuevoUsuario = new User(req.body);
+        await nuevoUsuario.save();
+        res.status(201).json(nuevoUsuario);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
 
-
-
-    // Connect to MongoDB
-    connectDB();
-
-    app.use(express.json());
-
-    app.get('/', (req, res) => {
-        res.send('Hello Mongo!');
-    });
-
-    app.listen(PORT, () => {    
-        console.log(`Server is running on port ${PORT}`);
-    });
+// RUTA PARA VER LOS USUARIOS (GET)
+app.get('/usuarios', async (req, res) => {
+    try {
+        const usuarios = await User.find();
+        res.json(usuarios);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
